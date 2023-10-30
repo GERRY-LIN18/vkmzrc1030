@@ -1,5 +1,7 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject ,ViewContainerRef } from '@angular/core';
 import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import { LocalService } from './local.service';
+import { GlobalService } from './global.service';
 
 export interface DialogData {
   animal: string;
@@ -12,16 +14,25 @@ export interface DialogData {
 @Component({
   selector: 'dialog-overview-example',
   templateUrl: 'dialog-overview-example.html',
+  providers:[LocalService]
+
 })
 export class DialogOverviewExample {
   animal: string;
   name: string;
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog,
+    public viewContainerRef:ViewContainerRef,
+    public globalService:GlobalService,
+    public localService:LocalService
+    ) {}
 
   openDialog(): void {
+    this.globalService.globalCount ++
+    this.localService.localCount ++
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
       data: {name: this.name, animal: this.animal},
+      viewContainerRef:this.viewContainerRef
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -38,6 +49,8 @@ export class DialogOverviewExample {
 export class DialogOverviewExampleDialog {
   constructor(
     public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
+    public globalService:GlobalService,
+    public localService:LocalService,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {}
 
